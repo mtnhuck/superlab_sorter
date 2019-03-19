@@ -13,16 +13,18 @@ def superlab_sorter(filename):
         mylist = f.read().splitlines()
 
     subject=mylist[0]
-    study=mylist[1]
-    [date,time]=mylist[2].split("\t")
+    study=mylist[2]
+    [date,time]=mylist[4].split("\t",1)
     del mylist
     #load file as pandas skipping first few rows for a clean import
-    superlabdf=pd.read_csv(filename,sep='\t',skiprows=5)
+    superlabdf=pd.read_csv(filename,sep='\t',skiprows=10)
+    superlabdf=superlabdf[::2]
+    superlabdf.reset_index(drop=True, inplace=True)
     superlabdf['changed'] = superlabdf['Name.2'].ne(superlabdf['Name.2'].shift().bfill()).astype(int)
-    #superlabdf.head(5)
     #need to setup event correctly since superlab doesn't make a unique event #
     superlabdf.loc[0, 'event']=0
     for i in range(1, len(superlabdf)):
+        #print(i)
         superlabdf.loc[i, 'event'] = superlabdf.loc[i-1, 'event'] + superlabdf.loc[i, 'changed']
     #superlabdf['event'].head(20)
     #separate into triggers and key presses
