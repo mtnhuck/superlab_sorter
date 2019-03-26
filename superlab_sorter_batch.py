@@ -27,12 +27,18 @@ def superlab_sorter(filename):
     #superlabdf['event'].head(20)
     #separate into triggers and key presses
     triggerdf=superlabdf.loc[superlabdf['Key.1'] == 5]
+    triggerdf=triggerdf.reset_index(drop=True) #reset index in case someone pressed a button before first trigger
     keypresses=superlabdf.loc[superlabdf['Key.1'].isin([1,2,3,4])]
     firsttrigger=triggerdf['Time'][0]
     print('First trigger at '+str(firsttrigger)+', subtracting this value from the rest of the cumulative times')
     pd.options.mode.chained_assignment = None  # default='warn'
     triggerdf['Time'] = triggerdf['Time']-firsttrigger
     keypresses['Time'] = keypresses['Time']-firsttrigger
+
+    keypresses[keypresses.Time<0]
+    keypresses=keypresses.reset_index(drop=True) #reset index in case someone pressed a button before first trigger
+
+
     #triggerdf['Name.2'].head(5)
     #triggerdf['Time'].tail(10)
 
